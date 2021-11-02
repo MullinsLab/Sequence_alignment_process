@@ -45,14 +45,14 @@ regionGene = {
     "REN": "Env"
 }
 geneStart = {
-    "Gag": 4,
-    "Pol": 1,
-    "Env": 256
+    "Gag": 86,
+    "Pol": 247,
+    "Env": 243
 }
 geneEnd = {
-    "Gag": 1504,
-    "Pol": 3012,
-    "Env": 2826
+    "Gag": 1588,
+    "Pol": 3258,
+    "Env": 2813
 }
 filecount = 0
 for file in glob.glob(os.path.join(dir, '*.fasta')):
