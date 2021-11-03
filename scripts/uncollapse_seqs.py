@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # uncollapse unique sequences into original sequences based on name file
 # Wenjie Deng
@@ -9,9 +9,6 @@ import sys
 import argparse
 
 def main(infile, namefile, outfile):
-    print("input: " + infile)
-    print("namefile: " + namefile)
-    print("output: " + outfile)
     names = []
     nameseq, uniqnamenames = ({} for i in range(2))
     seqname = ""
@@ -50,8 +47,8 @@ def main(infile, namefile, outfile):
             else:
                 seqcount += 1
                 outfp.write(">" + name + "\n" + nameseq[name] + "\n")
-
-    print("processed " + str(uniqcount) + " unique sequences, " + str(seqcount) + " uncollapsed sequences.")
+    log = "processed " + str(uniqcount) + " unique sequences, " + str(seqcount) + " uncollapsed sequences"
+    return log
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

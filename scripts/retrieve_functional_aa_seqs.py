@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # from a protein sequence alignment, retrieve functional amino acid sequences (stop codon
 # within 3' end of 5% of median alignment length and < 20% of deletions of median length
@@ -10,9 +10,6 @@ import re
 import argparse
 
 def main(infile, outfile, gene):
-    print("infile: "+infile)
-    print("outfile: "+outfile)
-    print("gene: "+gene)
     functionalaafile = infile.replace(".fasta", "_functional.fasta")
     defectiveaafile = infile.replace(".fasta", "_defective.fasta")
     ntfile = infile.replace("_AA_", "_NT_")
@@ -103,16 +100,15 @@ def main(infile, outfile, gene):
                             dafp.write(">" + name + "\n" + aaseq + "\n")
                             dnfp.write(">" + name + "\n" + ntseq + "\n")
 
-    with open(outfile, "a") as ofp:
+    with open(outfile, "w") as ofp:
         ofp.write(infile + "," + gene + "," + str(seqcount) + "," + str(functionalcount) + "," + str(
             prematurecount) + "," + str(deletioncount)
                   + "," + str(missing5count) + "," + str(notMcount) + "," + str(medianlen) + "\n")
 
-    print("Processing " + str(seqcount) + " sequences, " + str(functionalcount) + " functional, " + str(
-        missing5count) + " missing 5' end, "
-          + str(notMcount) + " not start with 'M', " + str(deletioncount) + " with big deletion (> 20%), " + str(
-        prematurecount)
-          + " premature stop (< 95%), median length: " + str(medianlen))
+    log = "Processing " + str(seqcount) + " sequences, " + str(functionalcount) + " functional, " + str(
+        missing5count) + " missing 5' end, " + str(notMcount) + " not start with 'M', " + str(deletioncount) + " with big deletion (> 20%), " + str(
+        prematurecount) + " premature stop (< 95%), median length: " + str(medianlen)
+    return log
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

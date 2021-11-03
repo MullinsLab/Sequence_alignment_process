@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # align sequences via Muscle
 # Wenjie Deng
@@ -8,8 +8,6 @@ import os
 import argparse
 
 def main(infile, outfile):
-    print("input: " + infile)
-    print("output: " + outfile)
     os.system("muscle -quiet -in "+infile+" -out "+outfile)
 
 if __name__ == '__main__':

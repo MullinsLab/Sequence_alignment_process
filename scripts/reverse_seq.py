@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # reverse sequences in a sequence fasta file
 # Wenjie Deng
@@ -8,8 +8,6 @@ import re
 import argparse
 
 def main(infile, outfile):
-    print("input: " + infile)
-    print("output: " + outfile)
     name = ""
     names = []
     nameSeq = {}
@@ -26,6 +24,7 @@ def main(infile, outfile):
     with open(outfile, "w") as ofp:
         for name in names:
             ofp.write(name + "\n" + nameSeq[name][::-1] + "\n")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

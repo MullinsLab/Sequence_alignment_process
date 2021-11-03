@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # extract alignment portion based on the coordinates of reference sequence
 # Wenjie Deng
@@ -8,12 +8,6 @@ import re
 import argparse
 
 def main(infile, outfile, region, gene, start, end):
-    print("infile: "+infile)
-    print("outfile: "+outfile)
-    print("region: "+region)
-    print("gene: "+gene)
-    print("gene start: "+str(start))
-    print("gene end: "+str(end))
     name, refname, refseq = '', '', ''
     nameSeq = {}
     names = []

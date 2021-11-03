@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # collapse sequences into unique sequences and output a name file showing the relationship between unique sequences and original sequences
 # Wenjie Deng
@@ -9,8 +9,6 @@ import re
 import argparse
 
 def main(infile, outfile):
-    print("input: " + infile)
-    print("output: " + outfile)
     names = []
     nametag, seqname, seq = "", "", ""
     count = 0
@@ -57,7 +55,8 @@ def main(infile, outfile):
                 out.write(seq + "\n")
                 fw.write(name + "\t" + ','.join(seqnames[seq]) + "\n")
 
-    print("processed " + str(count) + " sequences, " + str(uniqcount) + " unique sequences.")
+    log = "processed " + str(count) + " sequences, " + str(uniqcount) + " unique sequences"
+    return log
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

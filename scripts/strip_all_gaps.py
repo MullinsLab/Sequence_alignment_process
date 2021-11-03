@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # Purpose: parse the fasta alignment file, remove the columns which all gaps
 # Input: sequence alignment fasta file
@@ -11,8 +11,6 @@ import re
 import argparse
 
 def main(infile, outfile):
-    print("infile: "+infile)
-    print("outfile: "+outfile)
     names = []
     name = ""
     count, rmcount = 0, 0
@@ -56,8 +54,9 @@ def main(infile, outfile):
                 if removeSite.get(i) is None:
                     ofp.write(nameNts[name][i])
             ofp.write("\n")
-    print("total " + str(count) + " sequences, alignment length " + str(alignlen) + ", " + str(
-        rmcount) + " all gap columns removed")
+    log = "total " + str(count) + " sequences, alignment length " + str(alignlen) + ", " + str(
+        rmcount) + " all gap columns removed"
+    return log
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

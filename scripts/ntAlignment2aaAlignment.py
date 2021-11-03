@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # translates any nucleotide alignment into amino acid alignment
 # xxxx------xxxxx --> X--XX
@@ -10,8 +10,6 @@ import re
 import argparse
 
 def main(infile, outfile):
-    print("infile: "+infile)
-    print("outfile: "+outfile)
     name, refname, refseq = '', '', ''
     nameSeq = {}
     names = []

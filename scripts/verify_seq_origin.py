@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # verify the sequences between two files
 # Wenjie Deng
@@ -8,8 +8,6 @@ import re
 import argparse
 
 def main(infile, originfile):
-    print("input1: " + infile)
-    print("input2: " + originfile)
     name, originname = "", ""
     count, origincount = 0, 0
     nameseq, originnameseq = ({} for i in range(2))
@@ -42,14 +40,13 @@ def main(infile, originfile):
                 nameseq[name] += line
 
     if (origincount != count):
-        print("number of sequences are not same. count " + str(count) + ", original count " + str(origincount))
+        print("Error: number of sequences are not same. count " + str(count) + ", original count " + str(origincount))
 
     exactcount, containcount, origincontaincount, mismatchcount, missingcount = 0, 0, 0, 0, 0
     for originname in originnameseq:
         originalseq = originnameseq[originname]
         if nameseq.get(originname) is None:
             missingcount += 1
-            print(originname + " missing in " + infile + " file")
         else:
             seq = nameseq[originname]
             if (seq == originalseq):
@@ -66,9 +63,11 @@ def main(infile, originfile):
                         mismatchcount += 1
                         print("sequence " + originname + " are not same, original: " + originalseq + ", seq: " + seq)
 
-    print("total " + str(count) + " sequences, " + str(origincount) + " original sequences, " + str(
+    log = "total " + str(count) + " sequences, " + str(origincount) + " original sequences, " + str(
         exactcount) + " exact match, " + str(origincontaincount) + " contained in " + originfile + ", " + str(
-        containcount) + " contained in " + infile + ", " + str(missingcount) + " missed in " + infile)
+        containcount) + " contained in " + infile + ", " + str(missingcount) + " missed in " + infile
+    return log
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

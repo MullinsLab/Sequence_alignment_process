@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # append sequences
 # Wenjie Deng
@@ -7,9 +7,6 @@
 import argparse
 
 def main(infile1, infile2, outfile):
-    print("input1: " + infile1)
-    print("input2: " + infile2)
-    print("output: " + outfile)
     with open(outfile, "w") as ofp:
         with open(infile1, "r") as i1fp:
             for line in i1fp:
