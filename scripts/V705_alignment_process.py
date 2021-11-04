@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 ##########################################################################################
-# Program: V705_alignment_process.pl
+# Program: V705_alignment_process.py
 # Purpose: In a GP/POL/REN directory with sequence fasta files,
 # collapses sequences into unique sequences,
 # adds reference HXB2 GP/POL/REN sequence,
@@ -179,6 +179,8 @@ def worker(file, outdir, logdir, refpath):
         lfp.write("output: " + collapsedgapstripfile + "\n")
         lfp.write(colpslog + "\n")
 
+		# output success info
+        lfp.write("*** Succeed ***\n")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -196,7 +198,12 @@ if __name__ == '__main__':
     if os.path.isdir(logdir) is False:
         os.mkdir(logdir)
     scriptpath = os.path.dirname(__file__)
-    refpath = scriptpath.replace("scripts", "references")
+    refpath = ''
+    if scriptpath == '.':
+    	refpath = "../references"
+    else:
+    	refpath = scriptpath.replace("scripts", "references")
+    
     files = []
     for file in glob.glob(os.path.join(dir, '*.fasta')):
         files.append(file)
