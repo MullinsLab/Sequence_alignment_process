@@ -201,9 +201,11 @@ if __name__ == '__main__':
     refpath = ''
     if scriptpath == '.':
     	refpath = "../references"
-    else:
+    elif re.search("scripts", scriptpath):
     	refpath = scriptpath.replace("scripts", "references")
-    
+    else:
+        refpath = "/opt/V705_alignment_process/references"
+
     files = []
     for file in glob.glob(os.path.join(dir, '*.fasta')):
         files.append(file)
