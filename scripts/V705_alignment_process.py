@@ -14,7 +14,9 @@
 # Author: Wenjie Deng
 # Date: 2021-10-29
 # Modified: multiprocessing
-# Date; 2021-11-03
+# Date: 2021-11-03
+# Modified: change the structure of output files based on sample id
+# Date: 2021-11-05
 ##########################################################################################
 
 import sys, re, os
@@ -51,6 +53,11 @@ def worker(file, outdir, logdir, refpath):
     }
     fields = file.split("/")
     filename = fields[-1]
+    filenamefields = filename.split(".")
+    sampleid = filenamefields[0]
+    sampleoutdir = outdir + "/" + sampleid
+    if os.path.isdir(sampleoutdir) is False:
+        os.mkdir(sampleoutdir)
     region = ''
     if re.search("_GP_", file):
         region = "GP"
@@ -67,7 +74,7 @@ def worker(file, outdir, logdir, refpath):
 
     with open(logfile, "w") as lfp:
         # collapse sequences
-        collapsedfile = outdir + "/" + filename.replace(".fasta", "_collapsed.fasta")
+        collapsedfile = sampleoutdir + "/" + filename.replace(".fasta", "_collapsed.fasta")
         print("\n" + "=== Processing file " + file + " ===")
         collapselog = collapse_seqs.main(file, collapsedfile)
         lfp.write("=== Processing file " + file + " ===" + "\n")
@@ -100,10 +107,7 @@ def worker(file, outdir, logdir, refpath):
         lfp.write("output: " + reversedalignfile + "\n")
 
         # reverse back to make a left-aligned alignment
-        alignmentdir = outdir + "/alignments"
-        if os.path.isdir(alignmentdir) is False:
-            os.mkdir(alignmentdir)
-        withrefalignfile = alignmentdir + "/" + filename.replace(".fasta", "_collapsed_withRef_align.fasta")
+        withrefalignfile = collapsedfile.replace(".fasta", "_withRef_align.fasta")
         reverse_seq.main(reversedalignfile, withrefalignfile)
         lfp.write("** reverse sequences in " + reversedalignfile + " **" + "\n")
         lfp.write("input: " + reversedalignfile + "\n")
@@ -128,7 +132,7 @@ def worker(file, outdir, logdir, refpath):
 
         # retrieve gag/pol/env
         gene = regionGene[region]
-        genedir = alignmentdir + "/" + gene
+        genedir = sampleoutdir + "/" + gene
         if os.path.isdir(genedir) is False:
             os.mkdir(genedir)
         sgene = geneStart[gene]
