@@ -86,8 +86,8 @@ if __name__ == '__main__':
         refpath = scriptpath.replace("scripts", "references")
         reffile = refpath + "/HXB2_POL.fasta"
     else:
-        refpath = "/opt/V705_alignment_process/references/HXB2_POL.fasta"
-
+        reffile = "/opt/V705_alignment_process/references/HXB2_POL.fasta"
+    
     files = []
     for file in glob.glob(os.path.join(dir, '*_POL_*.fasta')):
         files.append(file)
