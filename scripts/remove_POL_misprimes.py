@@ -16,7 +16,7 @@ def main(infile, outfile, summaryfile):
     with open(infile, "r") as ifp:
         for line in ifp:
             line = line.strip()
-            linematch = re.search(">(\S+)", line)
+            linematch = re.search("^>(.*)$", line)
             if linematch:
                 name = linematch.group(1)
                 nameSeq[name] = ""
