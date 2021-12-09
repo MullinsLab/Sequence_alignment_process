@@ -8,7 +8,7 @@ import os
 import argparse
 
 def main(infile, outfile):
-    os.system("muscle -quiet -in "+infile+" -out "+outfile)
+    os.system("muscle -quiet -in "+infile+" -out "+outfile+" 2>/dev/null")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
