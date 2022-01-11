@@ -70,7 +70,7 @@ for sample in sorted(sampleRegionTP):
     for rg in sorted(sampleRegionTP[sample]):
         tps = sorted(sampleRegionTP[sample][rg])
         tp = "-".join(tps)
-        outfile = outdir + "/" + sample + "_" + tp + "_" + rg +".fasta"
+        outfile = outdir + "/" + sample + "_" + tp + "_" + rg +"_pblib.fasta"
         count = 0
         with open(outfile, "w") as ofp:
             for name in sorted(sampleRegionNameSeq[sample][rg]):
