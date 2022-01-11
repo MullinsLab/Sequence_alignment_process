@@ -16,7 +16,7 @@ import argparse
 import glob
 import calc_AA_consensus
 import muscle_align
-import profile_align
+import append_seqs
 from multiprocessing import Pool, Manager
 
 def worker(file, outdir, logdir, nameSeq):
@@ -92,19 +92,18 @@ if __name__ == '__main__':
                 afp.write("\n")
         afp.write("=== Write consensus sequences into " + consensusfile + " ===\n\n")
 
-        # align consensus sequences
-        print("=== Align consensus sequences in "+consensusfile+" ===\n")
-        consensusalignfile = consensusfile.replace(".fasta", "_align.fasta")
-        muscle_align.main(consensusfile, consensusalignfile)
-        afp.write("=== Align consensus sequences in "+consensusfile+" ===\n")
-        afp.write("input: " + consensusfile + "\n")
-        afp.write("output: " + consensusalignfile + "\n\n")
+        # combine reference and consensus sequences
+        print("=== Combine sequences in " + reffile + " and " + consensusfile + " ===\n")
+        consensusreffile = consensusfile.replace(".fasta", "_withRef.fasta")
+        append_seqs.main(reffile, consensusfile, consensusreffile)
+        afp.write("=== Combine sequences in " + reffile + " and " + consensusfile + " ===\n")
+        afp.write("input: " + reffile + ", " + consensusfile + "\n")
+        afp.write("output: " + consensusreffile + "\n\n")
 
-        # align reference alignment with consensus alignment via profile-profile align
-        print("=== Align " + reffile + " and " + consensusfile + " ===\n")
-        outfile = consensusalignfile.replace("_align.fasta", "_withRef_align.fasta")
-        profile_align.profile_align(reffile, consensusalignfile, outfile)
-        afp.write("=== Align " + reffile + " and " + consensusfile + " ===\n")
-        afp.write("input1: " + reffile + "\n")
-        afp.write("input2: " + consensusalignfile + "\n")
-        afp.write("output: " + outfile + "\n")
+        # align consensus and reference sequences
+        print("=== Align consensus and reference sequences in "+consensusreffile+" ===\n")
+        consensusrefalignfile = consensusreffile.replace(".fasta", "_align.fasta")
+        muscle_align.main(consensusreffile, consensusrefalignfile)
+        afp.write("=== Align consensus and sequences in "+consensusreffile+" ===\n")
+        afp.write("input: " + consensusreffile + "\n")
+        afp.write("output: " + consensusrefalignfile + "\n\n")
