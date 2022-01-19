@@ -10,10 +10,10 @@ import sys
 import re
 import argparse
 
-def main(infile, outfile):
+def main(infile, outfile, rmhxb2):
     names = []
     name = ""
-    count, rmcount = 0, 0
+    count, rmcount, alignlen = 0, 0, 0
     nameSeq, nameNts, removeSite = ({} for i in range(3))
     with open(infile, "r") as ifp:
         for line in ifp:
@@ -24,16 +24,21 @@ def main(infile, outfile):
                 nameSeq[name] = ""
                 namematch = re.search("HXB2", name)
                 if namematch:
-                    refname = name
+                    if rmhxb2 is False:
+                        count += 1
+                        names.append(name)
                 else:
                     count += 1
                     names.append(name)
             else:
                 nameSeq[name] += line
 
-    alignlen = len(nameSeq[refname])
+    idx = 0
     for name in names:
+        idx += 1
         seq = nameSeq[name]
+        if idx == 1:
+            alignlen = len(seq)
         if len(seq) != alignlen:
             sys.exit("sequence not aligned")
         nameNts[name] = list(seq)
@@ -62,8 +67,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("infile", help="input sequence alignment fasta file")
     parser.add_argument("outfile", help="output gap stripped sequence alignment fasta file")
+    parser.add_argument("-r", "--removeHXB2", help="flag for remove HXB2 sequence", action="store_true")
     args = parser.parse_args()
     infile = args.infile
     outfile = args.outfile
+    removehxb2 = args.removeHXB2
 
-    main(infile, outfile)
+    main(infile, outfile, removehxb2)

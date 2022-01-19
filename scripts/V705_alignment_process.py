@@ -22,6 +22,8 @@
 import sys, re, os
 import argparse
 import glob
+from argparse import ArgumentParser
+
 import collapse_seqs
 import append_seqs
 import reverse_seq
@@ -29,10 +31,12 @@ import muscle_align
 import uncollapse_seqs
 import verify_seq_origin
 import extract_alignment_portion
+import refine_pol_start_homopolymerT
 import ntAlignment2aaAlignment
 import retrieve_functional_aa_seqs
 import strip_all_gaps
 from multiprocessing import Pool
+import shutil
 
 
 def worker(file, outdir, logdir, refpath):
@@ -151,6 +155,27 @@ def worker(file, outdir, logdir, refpath):
         lfp.write("gene start: " + str(sgene) + "\n")
         lfp.write("gene end: " + str(egene) + "\n")
 
+        if re.search("_Pol_", genefile):
+            # refine Pol sequences at the beginning of 6 homopolymer Ts
+            originalpolfile = genefile.replace(".fasta", "_origin.fasta")
+            refinedpolfile = genefile.replace(".fasta", "_refined.fasta")
+            shutil.copyfile(genefile, originalpolfile)
+            lfp.write("** Refine Pol alignment for the beginning homopolymer T insertion in " + originalpolfile + " **" + "\n")
+            homopolymerTinscount = refine_pol_start_homopolymerT.main(originalpolfile, refinedpolfile)
+            if homopolymerTinscount:
+                lfp.write("input: " + originalpolfile + "\n")
+                lfp.write("output: " + refinedpolfile + "\n")
+                lfp.write(str(homopolymerTinscount)+" sequences with beginning homopolymer T insertions\n")
+
+                # strip all gap columns
+                striplog = strip_all_gaps.main(refinedpolfile, genefile, False)
+                lfp.write("** Strip all gap columns in " + refinedpolfile + " **" + "\n")
+                lfp.write("input: " + refinedpolfile + "\n")
+                lfp.write("output: " + genefile + "\n")
+                lfp.write(striplog + "\n")
+            else:
+                lfp.write("No sequence with beginning homopolymer T insertions\n")
+
         # translation
         geneaafile = genefile.replace("_NT_", "_AA_")
         ntAlignment2aaAlignment.main(genefile, geneaafile)
@@ -169,7 +194,7 @@ def worker(file, outdir, logdir, refpath):
         # remove HXB2 and strip all gap columns
         functionalaafile = geneaafile.replace(".fasta", "_functional.fasta")
         gapstripfile = functionalaafile.replace("_withRef_", "_")
-        striplog = strip_all_gaps.main(functionalaafile, gapstripfile)
+        striplog = strip_all_gaps.main(functionalaafile, gapstripfile, True)
         lfp.write("** Remove HXB2 and strip all gap columns in " + functionalaafile + " **" + "\n")
         lfp.write("input: " + functionalaafile + "\n")
         lfp.write("output: " + gapstripfile + "\n")
@@ -187,7 +212,7 @@ def worker(file, outdir, logdir, refpath):
         lfp.write("*** Succeed ***\n")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser: ArgumentParser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dir", help="directory to hold input sequence fasta file", nargs="?", const=1, type=str, default=".")
     parser.add_argument("-p", "--processes", help="number of processes for multiprocessing", nargs="?", const=1, type=int,
                         default="1")
