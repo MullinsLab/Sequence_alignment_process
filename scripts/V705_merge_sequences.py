@@ -52,6 +52,10 @@ if __name__ == '__main__':
                         if linematch:
                             id = linematch.group(1)
                             description = linematch.group(2)
+                            # remove viroverse ID if there is in the sequence name
+                            if re.search("\|", id):
+                                fields = id.split("|")
+                                id = fields[1]
                             if re.search("_rpt\d?_", id):
                                 id = re.sub("_rpt\d?_", "_", id)
                             if sampleRegionIdStatus[sample][region][id] == 0:
