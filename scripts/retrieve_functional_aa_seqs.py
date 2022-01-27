@@ -58,7 +58,7 @@ def main(infile, outfile, gene):
 
     sortedlens = sorted(lens)
     sortedalignlens = sorted(alignlens)
-    mediancount = int(float(seqcount) / 2 + 0.5)
+    mediancount = int(float(seqcount) / 2)
     medianlen = sortedlens[mediancount]
     medianalignlen = sortedalignlens[mediancount]
 
