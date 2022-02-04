@@ -7,7 +7,7 @@
 import re
 import argparse
 
-def main(infile, outfile, region, gene, start, end):
+def main(infile, outfile, region, gene, start, end, rmhxb2):
     name, refname, refseq = '', '', ''
     nameSeq = {}
     names = []
@@ -45,8 +45,9 @@ def main(infile, outfile, region, gene, start, end):
                 break
 
     with open(outfile, "w") as ofp:
-        refextract = refseq[startidx:endidx + 1]
-        ofp.write(">" + refname + "\n" + refextract + "\n")
+        if rmhxb2 is False:
+            refextract = refseq[startidx:endidx + 1]
+            ofp.write(">" + refname + "\n" + refextract + "\n")
         for name in names:
             seq = nameSeq[name]
             seqextract = seq[startidx:endidx + 1]
@@ -60,6 +61,7 @@ if __name__ == '__main__':
     parser.add_argument("gene", help="extracted gene name")
     parser.add_argument("-s", "--start", help="extract start position in HXB2 reference sequence (default: 1, beginning of HXB2)", default=1, nargs='?', const=1, type=int)
     parser.add_argument("-e", "--end", help="extract end position in HXB2 reference sequence (default: 0, end of HXB2)", default=0, nargs='?', const=1, type=int)
+    parser.add_argument("-r", "--removeHXB2", help="flag for remove HXB2 sequence", action="store_true")
     args = parser.parse_args()
     infile = args.infasta
     outfile = args.outfile
@@ -67,7 +69,8 @@ if __name__ == '__main__':
     gene = args.gene
     start = args.start
     end = args.end
+    removehxb2 = args.removeHXB2
 
-    main(infile, outfile, region, gene, start, end)
+    main(infile, outfile, region, gene, start, end, removehxb2)
 
 

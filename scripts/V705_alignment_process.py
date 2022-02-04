@@ -146,7 +146,7 @@ def worker(file, outdir, logdir, refpath):
         genefilename = uncollapsealignfilename.replace("_" + region + "_", "_" + gene + "_NT_")
         genefilename = genefilename.replace("_align.", ".")
         genefile = genedir + "/" + genefilename
-        extract_alignment_portion.main(uncollapsealignfile, genefile, region, gene, sgene, egene)
+        extract_alignment_portion.main(uncollapsealignfile, genefile, region, gene, sgene, egene, False)
         lfp.write("** Extract " + gene + " at HXB2 position of " + str(sgene) + " to " + str(egene) + " **" + "\n")
         lfp.write("input: " + uncollapsealignfile + "\n")
         lfp.write("output: " + genefile + "\n")
