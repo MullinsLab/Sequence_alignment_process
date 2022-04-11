@@ -52,7 +52,7 @@ def worker(file, outdir, logdir, refpath):
     }
     geneEnd = {
         "Gag": 1588,
-        "Pol": 3258,
+        "Pol": 3270,
         "Env": 2813
     }
     fields = file.split("/")
