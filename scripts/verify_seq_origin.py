@@ -66,6 +66,7 @@ def main(infile, originfile):
     log = "total " + str(count) + " sequences, " + str(origincount) + " original sequences, " + str(
         exactcount) + " exact match, " + str(origincontaincount) + " contained in " + originfile + ", " + str(
         containcount) + " contained in " + infile + ", " + str(missingcount) + " missed in " + infile
+    print(log)
     return log
 
 

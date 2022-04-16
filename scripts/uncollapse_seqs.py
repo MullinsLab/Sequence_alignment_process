@@ -48,6 +48,7 @@ def main(infile, namefile, outfile):
                 seqcount += 1
                 outfp.write(">" + name + "\n" + nameseq[name] + "\n")
     log = "processed " + str(uniqcount) + " unique sequences, " + str(seqcount) + " uncollapsed sequences"
+    print(log)
     return log
 
 if __name__ == '__main__':
