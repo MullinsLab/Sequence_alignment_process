@@ -81,7 +81,8 @@ if __name__ == '__main__':
                         muscle_align.main(gppolovlpfile, gppolovlpalignfile)
                         print("== Run FastTree on "+gppolovlpalignfile+" ==")
                         treefile = gppolovlpalignfile.replace(".fasta", ".tre")
-                        os.system("FastTree -nt -gtr < "+gppolovlpalignfile+" > "+treefile)
+                        fasttreecmd = "FastTree -nt -gtr < "+gppolovlpalignfile+" > "+treefile
+                        os.system(fasttreecmd)
                     else:
                         print("No corresponding POL alignments in "+poldir+"/ for "+gpfile+"\n")
                         continue
