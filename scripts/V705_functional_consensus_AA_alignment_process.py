@@ -79,7 +79,8 @@ if __name__ == '__main__':
         os.mkdir(consdir)
     with open(consensusfile, "w") as cfp:
         for name in consnameSeq:
-            cfp.write(">"+name+"\n"+consnameSeq[name]+"\n")
+            conseq = consnameSeq[name].replace("*", "Z")
+            cfp.write(">"+name+"\n"+conseq+"\n")
     with open(alllogfile, "w") as afp:
         for file in files:
             fields = file.split("/")
@@ -107,3 +108,5 @@ if __name__ == '__main__':
         afp.write("=== Align consensus and sequences in "+consensusreffile+" ===\n")
         afp.write("input: " + consensusreffile + "\n")
         afp.write("output: " + consensusrefalignfile + "\n\n")
+        
+        
