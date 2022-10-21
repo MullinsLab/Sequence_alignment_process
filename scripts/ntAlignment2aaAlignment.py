@@ -82,17 +82,29 @@ def main(infile, outfile):
         "TGA": "*",
     }
 
+    geneProtein = {
+        "gag": "Gag",
+        "pol": "Pol",
+        "env": "Env"
+    }
+
     with open(infile, "r") as ifp:
         for line in ifp:
             line = line.strip()
             linematch = re.search(">(\S+)", line)
             if linematch:
                 name = linematch.group(1)
-                names.append(name)
-                nameSeq[name] = ""
+                genenames = name.split("_")
+                if genenames[0] == "HXB2":
+                    gene = genenames[1]
+                else:
+                    gene = genenames[3]
+                aaname = name.replace("_"+gene+"_", "_"+geneProtein[gene]+"_")
+                names.append(aaname)
+                nameSeq[aaname] = ""
                 count += 1
             else:
-                nameSeq[name] += line.upper()
+                nameSeq[aaname] += line.upper()
 
     with open(outfile, "w") as ofp:
         for name in names:

@@ -9,17 +9,21 @@
 import re
 import argparse
 
-def main(infile, outfile, gene):
-    functionalaafile = infile.replace(".fasta", "_functional.fasta")
-    defectiveaafile = infile.replace(".fasta", "_defective.fasta")
-    ntfile = infile.replace("_AA_", "_NT_")
+def main(ntfile, aafile, outfile, gene):
+    geneProtein = {
+        "gag": "Gag",
+        "pol": "Pol",
+        "env": "Env"
+    }
+    functionalaafile = aafile.replace(".fasta", "_functional.fasta")
+    defectiveaafile = aafile.replace(".fasta", "_defective.fasta")
     functionalntfile = ntfile.replace(".fasta", "_functional.fasta")
     defevtiventfile = ntfile.replace(".fasta", "_defective.fasta")
     name = ""
     names, alignlens, lens = [], [], []
     count, seqcount, hxb2alignlen, maxalignlen, missing5count, notMcount, functionalcount, deletioncount, prematurecount = 0, 0, 0, 0, 0, 0, 0, 0, 0
     nameAaseq, nameNtseq, nameStatus = ({} for i in range(3))
-    with open(infile, "r") as ifp:
+    with open(aafile, "r") as ifp:
         for line in ifp:
             line = line.strip()
             linematch = re.search("^>(\S+)", line)
@@ -37,9 +41,10 @@ def main(infile, outfile, gene):
             linematch = re.search("^>(\S+)", line)
             if linematch:
                 name = linematch.group(1)
-                nameNtseq[name] = ""
+                pname = name.replace("_"+gene+"_", "_"+geneProtein[gene]+"_")
+                nameNtseq[pname] = ""
             else:
-                nameNtseq[name] += line
+                nameNtseq[pname] += line
 
     for name in names:
         aaseq = nameAaseq[name]
@@ -73,7 +78,7 @@ def main(infile, outfile, gene):
         else:
             if re.search("^-", seq):
                 missing5count += 1
-            elif (gene != "Pol" and re.search("^M", seq) is None):
+            elif (gene != "pol" and re.search("^M", seq) is None):
                 notMcount += 1
             elif seqlen >= medianalignlen * 0.95:
                 if len(gapstripseq) >= medianlen * 0.8:
@@ -93,15 +98,16 @@ def main(infile, outfile, gene):
                     for name in names:
                         aaseq = nameAaseq[name]
                         ntseq = nameNtseq[name]
+                        gname = name.replace("_"+geneProtein[gene]+"_", "_"+gene+"_")
                         if nameStatus.get(name):
                             fafp.write(">" + name + "\n" + aaseq + "\n")
-                            fnfp.write(">" + name + "\n" + ntseq + "\n")
+                            fnfp.write(">" + gname + "\n" + ntseq + "\n")
                         else:
                             dafp.write(">" + name + "\n" + aaseq + "\n")
-                            dnfp.write(">" + name + "\n" + ntseq + "\n")
+                            dnfp.write(">" + gname + "\n" + ntseq + "\n")
 
     with open(outfile, "w") as ofp:
-        ofp.write(infile + "," + gene + "," + str(seqcount) + "," + str(functionalcount) + "," + str(
+        ofp.write(aafile + "," + geneProtein[gene] + "," + str(seqcount) + "," + str(functionalcount) + "," + str(
             prematurecount) + "," + str(deletioncount)
                   + "," + str(missing5count) + "," + str(notMcount) + "," + str(medianlen) + "\n")
 
@@ -112,12 +118,14 @@ def main(infile, outfile, gene):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("infile", help="input AA fasta file")
+    parser.add_argument("ntfile", help="input NT fasta file")
+    parser.add_argument("aafile", help="input AA fasta file")
     parser.add_argument("outfile", help="output summary csv file")
     parser.add_argument("gene", help="gene name")
     args = parser.parse_args()
-    infile = args.infile
+    ntfile = args.ntfile
+    aafile = args.aafile
     outfile = args.outfile
     gene = args.gene
 
-    main(infile, outfile, gene)
+    main(ntfile, aafile, outfile, gene)

@@ -41,19 +41,24 @@ import shutil
 
 def worker(file, outdir, logdir, refpath):
     regionGene = {
-        "GP": "Gag",
-        "POL": "Pol",
-        "REN": "Env"
+        "GP": "gag",
+        "POL": "pol",
+        "REN": "env"
+    }
+    geneProtein = {
+        "gag": "Gag",
+        "pol": "Pol",
+        "env": "Env"
     }
     geneStart = {
-        "Gag": 86,
-        "Pol": 247,
-        "Env": 243
+        "gag": 86,
+        "pol": 247,
+        "env": 243
     }
     geneEnd = {
-        "Gag": 1588,
-        "Pol": 3270,
-        "Env": 2813
+        "gag": 1588,
+        "pol": 3270,
+        "env": 2813
     }
     fields = file.split("/")
     filename = fields[-1]
@@ -155,12 +160,12 @@ def worker(file, outdir, logdir, refpath):
         lfp.write("gene start: " + str(sgene) + "\n")
         lfp.write("gene end: " + str(egene) + "\n")
 
-        if re.search("_Pol_", genefile):
+        if re.search("_pol_", genefile):
             # refine Pol sequences at the beginning of 6 homopolymer Ts
             originalpolfile = genefile.replace(".fasta", "_origin.fasta")
             refinedpolfile = genefile.replace(".fasta", "_refined.fasta")
             shutil.copyfile(genefile, originalpolfile)
-            lfp.write("** Refine Pol alignment for the beginning homopolymer T insertion in " + originalpolfile + " **" + "\n")
+            lfp.write("** Refine pol alignment for the beginning homopolymer T insertion in " + originalpolfile + " **" + "\n")
             homopolymerTinscount = refine_pol_start_homopolymerT.main(originalpolfile, refinedpolfile)
             if homopolymerTinscount:
                 lfp.write("input: " + originalpolfile + "\n")
@@ -177,14 +182,15 @@ def worker(file, outdir, logdir, refpath):
                 lfp.write("No sequence with beginning homopolymer T insertions\n")
 
         # translation
-        geneaafile = genefile.replace("_NT_", "_AA_")
+        protein = geneProtein[gene]
+        geneaafile = genefile.replace("_" + gene + "_NT_", "_" + protein + "_AA_")
         ntAlignment2aaAlignment.main(genefile, geneaafile)
         lfp.write("** Translate nucleotide to amino acid sequences for " + genefile + " **" + "\n")
         lfp.write("input: " + genefile + "\n")
         lfp.write("output: " + geneaafile + "\n")
 
         #retrieve functional protein sequences and write summary
-        funclog = retrieve_functional_aa_seqs.main(geneaafile, tallyfile, gene)
+        funclog = retrieve_functional_aa_seqs.main(genefile, geneaafile, tallyfile, gene)
         lfp.write("** Retrieve functional amino acid sequences in " + geneaafile + " **" + "\n")
         lfp.write("input: " + geneaafile + "\n")
         lfp.write("output: " + tallyfile + "\n")
