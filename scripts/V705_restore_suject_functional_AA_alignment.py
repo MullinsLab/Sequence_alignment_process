@@ -99,7 +99,11 @@ if __name__ == '__main__':
                             consseqnogap = consseq.replace("-", "")
                             seqnogap = line.replace("-", "")
                             if consseqnogap != seqnogap:
-                                sys.exit("consensus sequences not match: "+consseqnogap+" vs. "+seqnogap)
+                                print("* consensus sequences do not match: "+consseqnogap+" vs. "+seqnogap+" *")
+                                if re.search(consseqnogap, seqnogap):
+                                    print("reviewed consensus was trimmed compared to the origianl consensus")
+                                else:
+                                    sys.exit("reviewed and original consensus sequences are totally different")
                         else:
                             nameAAs[collapsename] = list(line)
 
