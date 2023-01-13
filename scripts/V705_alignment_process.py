@@ -85,59 +85,66 @@ def worker(file, outdir, logdir, refpath):
         # collapse sequences
         collapsedfile = sampleoutdir + "/" + filename.replace(".fasta", "_collapsed.fasta")
         print("\n" + "=== Processing file " + file + " ===")
-        collapselog = collapse_seqs.main(file, collapsedfile)
         lfp.write("=== Processing file " + file + " ===" + "\n")
         lfp.write("** Collapse sequences in " + file + " **" + "\n")
         lfp.write("input: " + file + "\n")
         lfp.write("output: " + collapsedfile + "\n")
+        collapselog = collapse_seqs.main(file, collapsedfile)        
         lfp.write(collapselog + "\n")
+        lfp.write("* Done *\n")
 
         # append reference (HXB2) sequence
         reffile = refpath + "/HXB2_" + region + ".fasta"
         withreffile = collapsedfile.replace(".fasta", "_withRef.fasta")
-        append_seqs.main(reffile, collapsedfile, withreffile)
         lfp.write("** Append reference sequence to " + collapsedfile + " **" + "\n")
         lfp.write("input1: " + reffile + "\n")
         lfp.write("input2: " + collapsedfile + "\n")
         lfp.write("output: " + withreffile + "\n")
+        append_seqs.main(reffile, collapsedfile, withreffile)
+        lfp.write("* Done *\n")
 
         # reverse sequences
         reversedfile = withreffile.replace(".fasta", "_rvs.fasta")
-        reverse_seq.main(withreffile, reversedfile)
         lfp.write("** reverse sequences in " + withreffile + " **" + "\n")
         lfp.write("input: " + withreffile + "\n")
         lfp.write("output: " + reversedfile + "\n")
+        reverse_seq.main(withreffile, reversedfile)
+        lfp.write("* Done *\n")
 
         # align reversed sequences
         reversedalignfile = reversedfile.replace(".fasta", "_align.fasta")
-        muscle_align.main(reversedfile, reversedalignfile)
         lfp.write("** Align collapsed file " + reversedfile + " **\n")
         lfp.write("input: " + reversedfile + "\n")
         lfp.write("output: " + reversedalignfile + "\n")
+        muscle_align.main(reversedfile, reversedalignfile)
+        lfp.write("* Done *\n")
 
         # reverse back to make a left-aligned alignment
         withrefalignfile = collapsedfile.replace(".fasta", "_withRef_align.fasta")
-        reverse_seq.main(reversedalignfile, withrefalignfile)
         lfp.write("** reverse sequences in " + reversedalignfile + " **" + "\n")
         lfp.write("input: " + reversedalignfile + "\n")
         lfp.write("output: " + withrefalignfile + "\n")
+        reverse_seq.main(reversedalignfile, withrefalignfile)
+        lfp.write("* Done *\n")
 
         # uncollapse alignment
         uncollapsealignfile = withrefalignfile.replace("_collapsed", "")
         namefile = collapsedfile.replace(".fasta", ".name")
-        uncollapselog = uncollapse_seqs.main(withrefalignfile, namefile, uncollapsealignfile)
         lfp.write("** Uncollapse alignment " + withrefalignfile + " **" + "\n")
         lfp.write("input: " + withrefalignfile + "\n")
         lfp.write("namefile: " + namefile + "\n")
         lfp.write("output: " + uncollapsealignfile + "\n")
+        uncollapselog = uncollapse_seqs.main(withrefalignfile, namefile, uncollapsealignfile)        
         lfp.write(uncollapselog + "\n")
+        lfp.write("* Done *\n")
 
         # verify sequences
-        verifylog = verify_seq_origin.main(uncollapsealignfile, file)
         lfp.write("** Verify sequences between " + uncollapsealignfile + " **" + "\n")
         lfp.write("input1: " + uncollapsealignfile + "\n")
         lfp.write("input2: " + file + "\n")
+        verifylog = verify_seq_origin.main(uncollapsealignfile, file)        
         lfp.write(verifylog + "\n")
+        lfp.write("* Done *\n")
 
         # retrieve gag/pol/env
         gene = regionGene[region]
@@ -151,7 +158,6 @@ def worker(file, outdir, logdir, refpath):
         genefilename = uncollapsealignfilename.replace("_" + region + "_", "_" + gene + "_NT_")
         genefilename = genefilename.replace("_align.", ".")
         genefile = genedir + "/" + genefilename
-        extract_alignment_portion.main(uncollapsealignfile, genefile, region, gene, sgene, egene, False)
         lfp.write("** Extract " + gene + " at HXB2 position of " + str(sgene) + " to " + str(egene) + " **" + "\n")
         lfp.write("input: " + uncollapsealignfile + "\n")
         lfp.write("output: " + genefile + "\n")
@@ -159,6 +165,8 @@ def worker(file, outdir, logdir, refpath):
         lfp.write("gene: " + gene + "\n")
         lfp.write("gene start: " + str(sgene) + "\n")
         lfp.write("gene end: " + str(egene) + "\n")
+        extract_alignment_portion.main(uncollapsealignfile, genefile, region, gene, sgene, egene, False)
+        lfp.write("* Done *\n")
 
         if re.search("_pol_", genefile):
             # refine Pol sequences at the beginning of 6 homopolymer Ts
@@ -171,48 +179,54 @@ def worker(file, outdir, logdir, refpath):
                 lfp.write("input: " + originalpolfile + "\n")
                 lfp.write("output: " + refinedpolfile + "\n")
                 lfp.write(str(homopolymerTinscount)+" sequences with beginning homopolymer T insertions\n")
+                lfp.write("* Done *\n")
 
                 # strip all gap columns
-                striplog = strip_all_gaps.main(refinedpolfile, genefile, False)
                 lfp.write("** Strip all gap columns in " + refinedpolfile + " **" + "\n")
                 lfp.write("input: " + refinedpolfile + "\n")
                 lfp.write("output: " + genefile + "\n")
+                striplog = strip_all_gaps.main(refinedpolfile, genefile, False)                
                 lfp.write(striplog + "\n")
+                lfp.write("* Done *\n")
             else:
                 lfp.write("No sequence with beginning homopolymer T insertions\n")
 
         # translation
         protein = geneProtein[gene]
         geneaafile = genefile.replace("_" + gene + "_NT_", "_" + protein + "_AA_")
-        ntAlignment2aaAlignment.main(genefile, geneaafile)
         lfp.write("** Translate nucleotide to amino acid sequences for " + genefile + " **" + "\n")
         lfp.write("input: " + genefile + "\n")
         lfp.write("output: " + geneaafile + "\n")
+        ntAlignment2aaAlignment.main(genefile, geneaafile, gene, protein)
+        lfp.write("* Done *\n")
 
         #retrieve functional protein sequences and write summary
-        funclog = retrieve_functional_aa_seqs.main(genefile, geneaafile, tallyfile, gene)
         lfp.write("** Retrieve functional amino acid sequences in " + geneaafile + " **" + "\n")
         lfp.write("input: " + geneaafile + "\n")
         lfp.write("output: " + tallyfile + "\n")
         lfp.write("gene: " + gene + "\n")
+        funclog = retrieve_functional_aa_seqs.main(genefile, geneaafile, tallyfile, gene)        
         lfp.write(funclog + "\n")
+        lfp.write("* Done *\n")
 
         # remove HXB2 and strip all gap columns
         functionalaafile = geneaafile.replace(".fasta", "_functional.fasta")
         gapstripfile = functionalaafile.replace("_withRef_", "_")
-        striplog = strip_all_gaps.main(functionalaafile, gapstripfile, True)
         lfp.write("** Remove HXB2 and strip all gap columns in " + functionalaafile + " **" + "\n")
         lfp.write("input: " + functionalaafile + "\n")
         lfp.write("output: " + gapstripfile + "\n")
+        striplog = strip_all_gaps.main(functionalaafile, gapstripfile, True)        
         lfp.write(striplog + "\n")
+        lfp.write("* Done *\n")
 
         #collapse functional protein sequence alignment
         collapsedgapstripfile = gapstripfile.replace(".fasta", "_collapsed.fasta")
-        colpslog = collapse_seqs.main(gapstripfile, collapsedgapstripfile)
         lfp.write("** Collapse sequences in " + gapstripfile + " **" + "\n")
         lfp.write("input: " + gapstripfile + "\n")
         lfp.write("output: " + collapsedgapstripfile + "\n")
+        colpslog = collapse_seqs.main(gapstripfile, collapsedgapstripfile)        
         lfp.write(colpslog + "\n")
+        lfp.write("* Done *\n")
 
 		# output success info
         lfp.write("*** Succeed ***\n")

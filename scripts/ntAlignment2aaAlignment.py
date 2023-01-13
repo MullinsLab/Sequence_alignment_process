@@ -9,7 +9,7 @@
 import re
 import argparse
 
-def main(infile, outfile):
+def main(infile, outfile, gene, protein):
     name, refname, refseq = '', '', ''
     nameSeq = {}
     names = []
@@ -82,24 +82,13 @@ def main(infile, outfile):
         "TGA": "*",
     }
 
-    geneProtein = {
-        "gag": "Gag",
-        "pol": "Pol",
-        "env": "Env"
-    }
-
     with open(infile, "r") as ifp:
         for line in ifp:
             line = line.strip()
             linematch = re.search(">(\S+)", line)
             if linematch:
                 name = linematch.group(1)
-                genenames = name.split("_")
-                if genenames[0] == "HXB2":
-                    gene = genenames[1]
-                else:
-                    gene = genenames[3]
-                aaname = name.replace("_"+gene+"_", "_"+geneProtein[gene]+"_")
+                aaname = name.replace("_"+gene+"_", "_"+protein+"_")
                 names.append(aaname)
                 nameSeq[aaname] = ""
                 count += 1
@@ -151,9 +140,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("infile", help="input nuclotide sequence alignment fasta file")
     parser.add_argument("outfile", help="output amino acid sequence alignment fasta file")
+    parser.add_argument("gene", help="gene name")
+    parser.add_argument("protein", help="protein name")
     args = parser.parse_args()
     infile = args.infile
     outfile = args.outfile
+    gene = args.gene
+    protein = args.protein
 
-    main(infile, outfile)
+    main(infile, outfile, gene, protein)
 
