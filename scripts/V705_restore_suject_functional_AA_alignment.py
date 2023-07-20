@@ -69,7 +69,8 @@ if __name__ == '__main__':
         if namematch:
             sid = namematch.group(1)
         else:
-            sys.exit("name not formatted: "+consname)
+            print("* name not formatted, skipped: "+consname+" *")
+            continue
 
         for filename in os.listdir(aligndir):
             file = os.path.join(aligndir, filename)
