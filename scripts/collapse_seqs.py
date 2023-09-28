@@ -9,54 +9,71 @@ import re
 import argparse
 
 def main(infile, outfile):
-    names = []
-    nametag, seqname, seq = "", "", ""
+    seqname, namefile, id = '', '', ''
     count = 0
-    nameseq, seqcount, seqnames = ({} for i in range(3))
-    fields = infile.split("/")
-    filename = fields[-1]
-    match = re.search(r'(.*?).fasta$', filename)
+    idseqnames, nameseq, seqCount, idseqcount, uniqDup = ({} for i in range(5))
+    match = re.match(r'(.*).fasta$', infile)
     if match:
-        nametag = match.group(1)
+        id = match.group(1)
+        namefile = outfile.replace("fasta", "name")
     else:
         sys.exit("Not correct fasta file extension, must be '.fasta'")
-
-    with open(infile, "r") as fp:
-        for line in fp:
+    
+    with open(infile, "r") as ifp:
+        for line in ifp:
             line = line.strip()
-            linematch = re.match(r'^>(\S+)', line)
+            linematch = re.search('^>(\S+)', line)
             if linematch:
-                count += 1
                 seqname = linematch.group(1)
-                names.append(seqname)
+                if id not in idseqnames:
+                    idseqnames[id] = []
+                idseqnames[id].append(seqname)
+                count += 1
                 nameseq[seqname] = ""
             else:
-                nameseq[seqname] += line.upper()
+                line = line.upper()
+                nameseq[seqname] += line
 
-    for name in names:
-        seq = nameseq[name]
-        if seqcount.get(seq) is None:
-            seqcount[seq] = 0
-        seqcount[seq] += 1
+    for id in idseqnames:
+        for name in idseqnames[id]:
+            seq = nameseq[name]
+            if id not in seqCount:
+                seqCount[id] = {}
+            if seq not in seqCount[id]:
+                seqCount[id][seq] = 0
+            seqCount[id][seq] += 1
+            if id not in idseqcount:
+                idseqcount[id] = 0
+            idseqcount[id] += 1
+            if id not in uniqDup:
+                uniqDup[id] = {}
+            if seq not in uniqDup[id]:
+                uniqDup[id][seq] = []
+            uniqDup[id][seq].append(name)
 
-        if seqnames.get(seq) is None:
-            seqnames[seq] = []
-        seqnames[seq].append(name)
+    with open(outfile, "w") as ofp:
+        with open(namefile, "w") as nfp:
+            for id in sorted(seqCount):
+                uniqcount = 0
+                countseqs = {}
+                for seq in seqCount[id]:
+                    cnt = seqCount[id][seq]
+                    if cnt not in countseqs:
+                        countseqs[cnt] = []
+                    countseqs[cnt].append(seq)
 
-    uniqcount = 0
-    namefile = outfile.replace("fasta", "name")
+                counts = list(countseqs.keys())
+                counts.sort(reverse=True)
 
-    with open(outfile, "w") as out:
-        with open(namefile, "w") as fw:
-            for seq in sorted(seqcount, key=seqcount.get, reverse=True):
-                uniqcount += 1
-                name = nametag + "_" + str(uniqcount) + "_" + str(seqcount[seq])
-                out.write(">" + name + "\n")
-                out.write(seq + "\n")
-                fw.write(name + "\t" + ','.join(seqnames[seq]) + "\n")
-
+                for cnt in (counts):
+                    for seq in sorted(countseqs[cnt]):
+                        uniqcount += 1
+                        name = id+"_"+str(uniqcount)+"_"+str(seqCount[id][seq])
+                        ofp.write(">"+name+"\n"+seq+"\n")
+                        nfp.write(name + "\t" + ','.join(uniqDup[id][seq]) + "\n")
     log = "processed " + str(count) + " sequences, " + str(uniqcount) + " unique sequences"
     return log
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

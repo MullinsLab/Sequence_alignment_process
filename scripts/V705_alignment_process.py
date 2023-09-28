@@ -228,7 +228,7 @@ def worker(file, outdir, logdir, refpath):
         lfp.write(colpslog + "\n")
         lfp.write("* Done *\n")
 
-		# output success info
+        # output success info
         lfp.write("*** Succeed ***\n")
 
 if __name__ == '__main__':
@@ -249,16 +249,16 @@ if __name__ == '__main__':
     scriptpath = os.path.dirname(__file__)
     refpath = ''
     if scriptpath == '.':
-    	refpath = "../references"
+        refpath = "../references"
     elif re.search("scripts", scriptpath):
-    	refpath = scriptpath.replace("scripts", "references")
+        refpath = scriptpath.replace("scripts", "references")
     else:
         refpath = "/opt/V705_alignment_process/references"
 
     files = []
     for file in glob.glob(os.path.join(dir, '*.fasta')):
         files.append(file)
-
+    files.sort()
     pool = Pool(proc)
     pool.starmap(worker, [(file, outdir, logdir, refpath) for file in files])
 
